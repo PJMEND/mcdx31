@@ -41,7 +41,11 @@ pip install mcdx31
 # From GitHub
 pip install git+https://github.com/PJMEND/mcdx31.git
 
-# Run without installing
+# Run without installing (from the repo root, after cloning)
+pip install -e .
+mcdx31 input.mcdx
+
+# Or directly as a module (no install needed if dependencies are met)
 python -m mcdx_downgrade input.mcdx
 ```
 

@@ -1,4 +1,4 @@
-"""Unit tests for _transforms.py — no filesystem or Mathcad required."""
+﻿"""Unit tests for _transforms.py â€” no filesystem or Mathcad required."""
 from __future__ import annotations
 
 import io
@@ -6,7 +6,7 @@ import zipfile
 
 import pytest
 
-from mcdx_downgrade._transforms import (
+from mcdx31._transforms import (
     build_empty_result,
     downgrade_run_attrs,
     downgrade_xaml,
@@ -136,7 +136,7 @@ def test_build_empty_result_preserves_namespaces():
     result = build_empty_result(orig).decode()
     assert 'xmlns:ml=' in result
     assert '<resultsList' in result
-    # Must be empty — no child elements
+    # Must be empty â€” no child elements
     assert "<entry" not in result
 
 
@@ -232,3 +232,4 @@ def test_downgrade_zip_worksheet_no_msg_id():
     with zipfile.ZipFile(out_buf) as z:
         ws = z.read("mathcad/worksheet.xml").decode()
     assert 'msg-id=' not in ws
+

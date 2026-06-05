@@ -1,4 +1,4 @@
-"""Unit tests for _validate.py — uses synthetic ZIP fixtures."""
+﻿"""Unit tests for _validate.py â€” uses synthetic ZIP fixtures."""
 from __future__ import annotations
 
 import io
@@ -7,7 +7,7 @@ import zipfile
 
 import pytest
 
-from mcdx_downgrade._validate import (
+from mcdx31._validate import (
     ValidationResult,
     check_app_xml_version,
     check_result_xml,
@@ -178,3 +178,4 @@ def test_validate_returns_dataclass(tmp_path):
     p = _make_mcdx(tmp_path, app_xml=xml, result_xml=result_xml, xaml_doc="<Run>hi</Run>")
     result = validate(p)
     assert isinstance(result, ValidationResult)
+

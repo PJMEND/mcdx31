@@ -1,4 +1,4 @@
-"""
+﻿"""
 Generate synthetic .mcdx fixture files for the test suite.
 
 Run once to (re)create the committed binary fixtures:
@@ -98,7 +98,7 @@ def make_prime31_mcdx(path: pathlib.Path) -> None:
     if _src not in _syspath:
         _syspath.insert(0, _src)
 
-    from mcdx_downgrade._transforms import downgrade_zip
+    from mcdx31._transforms import downgrade_zip
 
     src_path = FIXTURES / "minimal_prime12.mcdx"
     buf = io.BytesIO()
@@ -115,3 +115,4 @@ if __name__ == "__main__":
     make_prime12_mcdx(FIXTURES / "minimal_prime12.mcdx")
     make_prime31_mcdx(FIXTURES / "minimal_prime31.mcdx")
     print("Done.")
+

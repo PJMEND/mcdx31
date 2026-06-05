@@ -46,7 +46,7 @@ pip install -e .
 mcdx31 input.mcdx
 
 # Or directly as a module (no install needed if dependencies are met)
-python -m mcdx_downgrade input.mcdx
+python -m mcdx31 input.mcdx
 ```
 
 ---
@@ -108,7 +108,7 @@ Opens a simple window where you can browse for files or folders, set options, an
 
 ```python
 from pathlib import Path
-from mcdx_downgrade import downgrade, validate_mcdx
+from mcdx31 import downgrade, validate_mcdx
 
 changed = downgrade(Path("mysheet.mcdx"), Path("mysheet_3x.mcdx"), verbose=True)
 print("Modified entries:", changed)

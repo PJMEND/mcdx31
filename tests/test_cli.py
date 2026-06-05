@@ -1,4 +1,4 @@
-"""Integration tests for cli.py — exercises the full conversion pipeline."""
+﻿"""Integration tests for cli.py â€” exercises the full conversion pipeline."""
 from __future__ import annotations
 
 import io
@@ -9,7 +9,7 @@ import zipfile
 
 import pytest
 
-from mcdx_downgrade.cli import main
+from mcdx31.cli import main
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 SRC = FIXTURES / "minimal_prime12.mcdx"
@@ -135,7 +135,7 @@ def test_output_passes_validation(tmp_path):
 
 def test_nonexistent_file_skipped(tmp_path):
     code = main([str(tmp_path / "does_not_exist.mcdx")])
-    # No files to convert → exit 2
+    # No files to convert â†’ exit 2
     assert code == 2
 
 
@@ -161,3 +161,4 @@ def test_version_flag(capsys):
     assert exc.value.code == 0
     captured = capsys.readouterr()
     assert "0.1.0" in captured.out
+

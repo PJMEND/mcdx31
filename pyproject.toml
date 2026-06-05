@@ -29,15 +29,15 @@ classifiers = [
 dev = ["pytest>=7"]
 
 [project.scripts]
-mcdx31 = "mcdx_downgrade.cli:main"
-mcdx31-gui = "mcdx_downgrade.gui:main"
+mcdx31 = "mcdx31.cli:main"
+mcdx31-gui = "mcdx31.gui:main"
 
 [project.urls]
 Homepage = "https://github.com/PJMEND/mcdx31"
 Issues = "https://github.com/PJMEND/mcdx31/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcdx_downgrade"]
+packages = ["src/mcdx31"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

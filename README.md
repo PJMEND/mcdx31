@@ -2,7 +2,7 @@
 
 Convert Mathcad Prime 4–12 worksheets to Prime 3.1 format.
 
-**mcdx31** lets you open `.mcdx` files created in any version of Mathcad Prime (4 through 12) in Prime 3.1 — useful when you need compatibility with an older Mathcad installation, when sharing calculations with colleagues or clients who are still running Prime 3.1, or when a project requires delivery in a specific legacy format.
+**mcdx31** lets you open `.mcdx` files created in any version of Mathcad Prime/Express (4 through 12) in Prime 3.1 — useful when you need compatibility with an older Mathcad installation, when sharing calculations with colleagues or clients who are still running Prime 3.1, or when a project requires delivery in a specific legacy format.
 
 ---
 

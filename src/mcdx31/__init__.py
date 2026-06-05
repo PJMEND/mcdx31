@@ -1,4 +1,4 @@
-"""mcdx-downgrade: convert Mathcad Prime 4–12 worksheets to Prime 3.1 format."""
+﻿"""mcdx31: convert Mathcad Prime 4–12 worksheets to Prime 3.1 format."""
 from __future__ import annotations
 
 import io
@@ -6,14 +6,14 @@ import pathlib
 import zipfile
 from typing import List
 
-from ._transforms import downgrade_zip
+from ._transforms import convert_zip
 from ._validate import ValidationResult, validate as _validate
 
 __version__ = "0.1.0"
-__all__ = ["downgrade", "validate_mcdx", "__version__"]
+__all__ = ["convert", "validate_mcdx", "__version__"]
 
 
-def downgrade(
+def convert(
     src: pathlib.Path,
     dst: pathlib.Path,
     *,
@@ -35,7 +35,7 @@ def downgrade(
     buf = io.BytesIO()
     with zipfile.ZipFile(src) as zin:
         with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            changed = downgrade_zip(zin, zout, verbose=verbose)
+            changed = convert_zip(zin, zout, verbose=verbose)
 
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_bytes(buf.getvalue())

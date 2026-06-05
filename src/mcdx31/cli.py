@@ -1,4 +1,4 @@
-"""Command-line interface for mcdx-downgrade."""
+﻿"""Command-line interface for mcdx31."""
 from __future__ import annotations
 
 import argparse
@@ -10,7 +10,7 @@ import tempfile
 from typing import List, Tuple
 
 from . import __version__
-from ._transforms import downgrade_zip
+from ._transforms import convert_zip
 from ._validate import validate
 
 import io
@@ -100,7 +100,7 @@ def _convert_one(
         buf = io.BytesIO()
         with zipfile.ZipFile(src) as zin:
             with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-                changed = downgrade_zip(zin, zout, verbose=verbose)
+                changed = convert_zip(zin, zout, verbose=verbose)
 
         if in_place:
             # Atomic overwrite via a temp file in the same directory

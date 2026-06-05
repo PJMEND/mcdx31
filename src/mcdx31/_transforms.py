@@ -1,4 +1,4 @@
-"""Pure XML/ZIP transform functions — no filesystem I/O."""
+﻿"""Pure XML/ZIP transform functions — no filesystem I/O."""
 from __future__ import annotations
 
 import io
@@ -14,23 +14,23 @@ def strip_msg_id(ws_xml: str) -> str:
     return re.sub(r'\s+msg-id="[^"]*"', "", ws_xml, count=1)
 
 
-def downgrade_run_attrs(tag_attrs: str) -> str:
+def strip_run_attrs(tag_attrs: str) -> str:
     """Strip style="..." and xml:lang="..." from a <Run> element's attribute string."""
     tag_attrs = re.sub(r'\s+style="[^"]*"', "", tag_attrs)
     tag_attrs = re.sub(r'\s+xml:lang="[^"]*"', "", tag_attrs)
     return tag_attrs
 
 
-def downgrade_xaml(doc: str) -> str:
+def strip_xaml_attrs(doc: str) -> str:
     """Remove Prime 4+ Run attributes that the Prime 3.1 FlowDocument deserializer rejects."""
     return re.sub(
         r"<Run([^>]*)>",
-        lambda m: "<Run" + downgrade_run_attrs(m.group(1)) + ">",
+        lambda m: "<Run" + strip_run_attrs(m.group(1)) + ">",
         doc,
     )
 
 
-def downgrade_xaml_package(pkg_bytes: bytes) -> bytes:
+def convert_xaml_package(pkg_bytes: bytes) -> bytes:
     """Rewrite a XamlPackage (ZIP-in-ZIP) with 3.1-compatible Document.xaml."""
     src = zipfile.ZipFile(io.BytesIO(pkg_bytes))
     buf = io.BytesIO()
@@ -38,7 +38,7 @@ def downgrade_xaml_package(pkg_bytes: bytes) -> bytes:
         for info in src.infolist():
             content = src.read(info.filename)
             if info.filename == "Xaml/Document.xaml":
-                content = downgrade_xaml(content.decode("utf-8")).encode("utf-8")
+                content = strip_xaml_attrs(content.decode("utf-8")).encode("utf-8")
             dst.writestr(info, content)
     return buf.getvalue()
 
@@ -57,7 +57,7 @@ def build_empty_result(orig_result_xml: str) -> bytes:
     ).encode("utf-8")
 
 
-def downgrade_zip(
+def convert_zip(
     zin: zipfile.ZipFile,
     zout: zipfile.ZipFile,
     *,
@@ -105,7 +105,7 @@ def downgrade_zip(
 
         elif name.startswith("mathcad/xaml/") and name.endswith(".XamlPackage"):
             original = zin.read(name)
-            patched = downgrade_xaml_package(original)
+            patched = convert_xaml_package(original)
             zout.writestr(info, patched)
             if patched != original:
                 changed.append(name)

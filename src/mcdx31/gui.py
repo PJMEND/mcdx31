@@ -1,4 +1,4 @@
-"""Standalone Tkinter GUI for mcdx-downgrade."""
+﻿"""Standalone Tkinter GUI for mcdx31."""
 from __future__ import annotations
 
 import io
@@ -12,7 +12,7 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 from typing import List
 
 from . import __version__
-from ._transforms import downgrade_zip
+from ._transforms import convert_zip
 from ._validate import validate
 
 
@@ -345,7 +345,7 @@ def _do_convert(
     buf = io.BytesIO()
     with zipfile.ZipFile(src) as zin:
         with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            changed = downgrade_zip(zin, zout, verbose=verbose)
+            changed = convert_zip(zin, zout, verbose=verbose)
 
     in_place = src == dst
     if in_place:

@@ -98,13 +98,13 @@ def make_prime31_mcdx(path: pathlib.Path) -> None:
     if _src not in _syspath:
         _syspath.insert(0, _src)
 
-    from mcdx31._transforms import downgrade_zip
+    from mcdx31._transforms import convert_zip
 
     src_path = FIXTURES / "minimal_prime12.mcdx"
     buf = io.BytesIO()
     with zipfile.ZipFile(src_path) as zin:
         with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            downgrade_zip(zin, zout)
+            convert_zip(zin, zout)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(buf.getvalue())

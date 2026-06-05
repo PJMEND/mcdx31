@@ -108,9 +108,9 @@ Opens a simple window where you can browse for files or folders, set options, an
 
 ```python
 from pathlib import Path
-from mcdx31 import downgrade, validate_mcdx
+from mcdx31 import convert, validate_mcdx
 
-changed = downgrade(Path("mysheet.mcdx"), Path("mysheet_3x.mcdx"), verbose=True)
+changed = convert(Path("mysheet.mcdx"), Path("mysheet_3x.mcdx"), verbose=True)
 print("Modified entries:", changed)
 
 result = validate_mcdx(Path("mysheet_3x.mcdx"))

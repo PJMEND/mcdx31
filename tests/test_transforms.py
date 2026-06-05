@@ -8,10 +8,10 @@ import pytest
 
 from mcdx31._transforms import (
     build_empty_result,
-    downgrade_run_attrs,
-    downgrade_xaml,
-    downgrade_xaml_package,
-    downgrade_zip,
+    strip_run_attrs,
+    strip_xaml_attrs,
+    convert_xaml_package,
+    convert_zip,
     strip_msg_id,
 )
 
@@ -40,61 +40,61 @@ def test_strip_msg_id_only_removes_first():
 
 
 # ---------------------------------------------------------------------------
-# downgrade_run_attrs
+# strip_run_attrs
 # ---------------------------------------------------------------------------
 
-def test_downgrade_run_attrs_strips_style():
-    result = downgrade_run_attrs(' style="font-size:10pt"')
+def test_strip_run_attrs_strips_style():
+    result = strip_run_attrs(' style="font-size:10pt"')
     assert 'style=' not in result
 
 
-def test_downgrade_run_attrs_strips_xml_lang():
-    result = downgrade_run_attrs(' xml:lang="en-US"')
+def test_strip_run_attrs_strips_xml_lang():
+    result = strip_run_attrs(' xml:lang="en-US"')
     assert 'xml:lang=' not in result
 
 
-def test_downgrade_run_attrs_preserves_other():
-    result = downgrade_run_attrs(' FontFamily="Arial" style="x" FontSize="12"')
+def test_strip_run_attrs_preserves_other():
+    result = strip_run_attrs(' FontFamily="Arial" style="x" FontSize="12"')
     assert 'FontFamily="Arial"' in result
     assert 'FontSize="12"' in result
     assert 'style=' not in result
 
 
-def test_downgrade_run_attrs_empty():
-    assert downgrade_run_attrs("") == ""
+def test_strip_run_attrs_empty():
+    assert strip_run_attrs("") == ""
 
 
 # ---------------------------------------------------------------------------
-# downgrade_xaml
+# strip_xaml_attrs
 # ---------------------------------------------------------------------------
 
-def test_downgrade_xaml_strips_run_attrs():
+def test_strip_xaml_attrs_strips_run_attrs():
     doc = '<Run style="font-size:10pt" xml:lang="en-US">hello</Run>'
-    out = downgrade_xaml(doc)
+    out = strip_xaml_attrs(doc)
     assert out == "<Run>hello</Run>"
 
 
-def test_downgrade_xaml_preserves_non_run():
+def test_strip_xaml_attrs_preserves_non_run():
     doc = '<Paragraph style="normal"><Run>text</Run></Paragraph>'
-    out = downgrade_xaml(doc)
+    out = strip_xaml_attrs(doc)
     assert '<Paragraph style="normal">' in out
     assert "<Run>text</Run>" in out
 
 
-def test_downgrade_xaml_multiple_runs():
+def test_strip_xaml_attrs_multiple_runs():
     doc = (
         '<Run style="a" xml:lang="en">one</Run>'
         '<Run xml:lang="fr">two</Run>'
         "<Run>three</Run>"
     )
-    out = downgrade_xaml(doc)
+    out = strip_xaml_attrs(doc)
     assert out.count('<Run>') == 3
     assert 'style=' not in out
     assert 'xml:lang=' not in out
 
 
 # ---------------------------------------------------------------------------
-# downgrade_xaml_package
+# convert_xaml_package
 # ---------------------------------------------------------------------------
 
 def _make_xaml_pkg(doc: str) -> bytes:
@@ -105,9 +105,9 @@ def _make_xaml_pkg(doc: str) -> bytes:
     return buf.getvalue()
 
 
-def test_downgrade_xaml_package_strips_run_attrs():
+def test_convert_xaml_package_strips_run_attrs():
     pkg = _make_xaml_pkg('<Run style="x" xml:lang="en">hi</Run>')
-    out = downgrade_xaml_package(pkg)
+    out = convert_xaml_package(pkg)
     with zipfile.ZipFile(io.BytesIO(out)) as z:
         doc = z.read("Xaml/Document.xaml").decode()
     assert 'style=' not in doc
@@ -115,9 +115,9 @@ def test_downgrade_xaml_package_strips_run_attrs():
     assert "<Run>hi</Run>" in doc
 
 
-def test_downgrade_xaml_package_preserves_other_entries():
+def test_convert_xaml_package_preserves_other_entries():
     pkg = _make_xaml_pkg("<Run>text</Run>")
-    out = downgrade_xaml_package(pkg)
+    out = convert_xaml_package(pkg)
     with zipfile.ZipFile(io.BytesIO(out)) as z:
         assert z.read("other.xml") == b"<other/>"
 
@@ -147,11 +147,11 @@ def test_build_empty_result_fallback_when_no_match():
 
 
 # ---------------------------------------------------------------------------
-# downgrade_zip (integration of all transforms)
+# convert_zip (integration of all transforms)
 # ---------------------------------------------------------------------------
 
 def _make_prime12_zip() -> bytes:
-    """Build a minimal Prime 12 .mcdx bytes for testing downgrade_zip."""
+    """Build a minimal Prime 12 .mcdx bytes for testing convert_zip."""
     inner_xaml = _make_xaml_pkg('<Run style="x" xml:lang="en">text</Run>')
 
     app_xml = (
@@ -175,59 +175,59 @@ def _make_prime12_zip() -> bytes:
     return buf.getvalue()
 
 
-def test_downgrade_zip_modifies_expected_entries():
+def test_convert_zip_modifies_expected_entries():
     src_bytes = _make_prime12_zip()
     out_buf = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(src_bytes)) as zin:
         with zipfile.ZipFile(out_buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            changed = downgrade_zip(zin, zout)
+            changed = convert_zip(zin, zout)
 
     assert "docProps/app.xml" in changed
     assert "mathcad/settings/calculation.xml" in changed
     assert "mathcad/result.xml" in changed
 
 
-def test_downgrade_zip_preserves_unrelated_entries():
+def test_convert_zip_preserves_unrelated_entries():
     src_bytes = _make_prime12_zip()
     out_buf = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(src_bytes)) as zin:
         with zipfile.ZipFile(out_buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            downgrade_zip(zin, zout)
+            convert_zip(zin, zout)
 
     with zipfile.ZipFile(out_buf) as z:
         assert z.read("mathcad/integration.xml") == b"<integration/>"
 
 
-def test_downgrade_zip_app_xml_contains_31():
+def test_convert_zip_app_xml_contains_31():
     src_bytes = _make_prime12_zip()
     out_buf = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(src_bytes)) as zin:
         with zipfile.ZipFile(out_buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            downgrade_zip(zin, zout)
+            convert_zip(zin, zout)
 
     with zipfile.ZipFile(out_buf) as z:
         app = z.read("docProps/app.xml").decode()
     assert "3.1.0.0" in app
 
 
-def test_downgrade_zip_result_is_empty():
+def test_convert_zip_result_is_empty():
     src_bytes = _make_prime12_zip()
     out_buf = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(src_bytes)) as zin:
         with zipfile.ZipFile(out_buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            downgrade_zip(zin, zout)
+            convert_zip(zin, zout)
 
     with zipfile.ZipFile(out_buf) as z:
         result = z.read("mathcad/result.xml").decode()
     assert "<entry" not in result
 
 
-def test_downgrade_zip_worksheet_no_msg_id():
+def test_convert_zip_worksheet_no_msg_id():
     src_bytes = _make_prime12_zip()
     out_buf = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(src_bytes)) as zin:
         with zipfile.ZipFile(out_buf, "w", compression=zipfile.ZIP_DEFLATED) as zout:
-            downgrade_zip(zin, zout)
+            convert_zip(zin, zout)
 
     with zipfile.ZipFile(out_buf) as z:
         ws = z.read("mathcad/worksheet.xml").decode()

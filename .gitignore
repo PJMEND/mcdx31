@@ -29,6 +29,9 @@ htmlcov/
 *.mcdx.bak
 *.mcdx.bak.*
 
+# PyInstaller
+*.spec
+
 # OS
 .DS_Store
 Thumbs.db

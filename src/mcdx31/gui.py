@@ -163,6 +163,8 @@ class DowngradeApp(tk.Tk):
         self._log.pack(fill="both", expand=True, padx=10, pady=(0, 8))
 
         self._on_mode_changed()
+        # Auto-open file picker so double-clicking the exe goes straight to browse
+        self.after(150, self._browse_input)
 
     # ------------------------------------------------------------------
     # Mode switching
